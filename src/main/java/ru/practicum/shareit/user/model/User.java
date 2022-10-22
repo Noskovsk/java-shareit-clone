@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Data
 public class User {
-    private long id;
+    private Long id;
     @NotBlank
     private String name;
     @Email
