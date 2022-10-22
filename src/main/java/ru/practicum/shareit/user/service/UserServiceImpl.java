@@ -19,6 +19,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private final UserRepository userRepository;
+
     @Override
     public User getUserById(long userId) {
         log.info("Получен запрос на поиск пользователя с id: {}", userId);
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
-        log.info("Получен запрос на создание пользователя: name = {}, email = {}",user.getName(), user.getEmail());
+        log.info("Получен запрос на создание пользователя: name = {}, email = {}", user.getName(), user.getEmail());
         Optional<User> userOptional = userRepository.createUser(user);
         if (userOptional.isEmpty()) {
             log.error("Ошибка при записи пользователя. Пользователь с таким email уже существует: {}", user.getEmail());
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(long userId, User patchUser) {
-        log.info("Получен запрос на изменение данных пользователя с id {}",userId);
+        log.info("Получен запрос на изменение данных пользователя с id {}", userId);
         if ((patchUser.getEmail() != (null)) && userRepository.repositoryContainsUserWithEmail(patchUser)) {
             log.error("Ошибка при изменении данных пользователя. Пользователь с таким email уже существует: {}", patchUser.getEmail());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка. Пользователь с таким email уже существует: " + patchUser.getEmail());
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
-        log.info("Получен запрос на удаление пользователя с id {}",userId);
+        log.info("Получен запрос на удаление пользователя с id {}", userId);
         if (!userRepository.deleteUser(getUserById(userId))) {
             log.error("Ошибка при удалении пользователя с id = {}.", userId);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при удалении пользователя с id = " + userId + ".");

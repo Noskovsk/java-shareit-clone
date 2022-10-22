@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.dto;
 
 import org.modelmapper.ModelMapper;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
 
