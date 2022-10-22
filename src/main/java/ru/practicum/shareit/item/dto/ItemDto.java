@@ -1,13 +1,14 @@
 package ru.practicum.shareit.item.dto;
 
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.model.User;
+import lombok.Data;
 
+import javax.validation.constraints.Size;
+
+@Data
 public class ItemDto {
-    private long id;
+    @Size(min = 1)
     private String name;
+    @Size(min = 1)
     private String description;
-    private boolean available;
-    private User owner;
-    private ItemRequest itemRequest;
+    private Boolean available;
 }

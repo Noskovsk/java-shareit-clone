@@ -3,14 +3,13 @@ package ru.practicum.shareit.user.dto;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 public class UserDto {
-    private Long id;
-    @NotBlank
+    @Size(min= 1)
     private String name;
-    @NotBlank
+    @Size(min = 2)
     @Email
     private String email;
 

@@ -11,6 +11,7 @@ public class User {
     private Long id;
     @NotBlank
     private String name;
+    @NotBlank
     @Email
     private String email;
 

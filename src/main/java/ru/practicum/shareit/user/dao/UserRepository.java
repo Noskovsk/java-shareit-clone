@@ -7,13 +7,15 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    public Optional<User> getUserById(Long userId);
+    Optional<User> getUserById(Long userId);
 
-    public boolean repositoryContainsUserWithEmail(User user);
+    boolean repositoryContainsUserWithEmail(User user);
 
-    public Optional<User> createUser(User user);
+    Optional<User> createUser(User user);
 
-    public List<User> getAll();
+    List<User> getAll();
 
-    public boolean deleteUser(User user);
+    boolean deleteUser(User user);
+
+    User patchUser(User patchUser, User userById);
 }

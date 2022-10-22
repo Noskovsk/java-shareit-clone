@@ -1,13 +1,10 @@
 package ru.practicum.shareit.user.dao;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Repository
 public class UserInMemoryRepository implements UserRepository {
@@ -32,10 +29,15 @@ public class UserInMemoryRepository implements UserRepository {
     }
 
     public List<User> getAll() {
-        return userHashMap.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(userHashMap.values());
     }
 
     public boolean deleteUser(User user) {
         return userHashMap.remove(user.getId(), user);
+    }
+
+    @Override
+    public User patchUser(User patchUser, User userById) {
+        return UserMapper.patchUser(patchUser, userById);
     }
 }

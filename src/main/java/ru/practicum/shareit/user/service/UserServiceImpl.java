@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.dao.UserRepository;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.getUserById(userId);
         if (userOptional.isEmpty()) {
             log.error("Ошибка при поиске пользователя с userId: {}", userId);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при поиске пользователя!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ошибка при поиске пользователя!");
         } else {
             return userOptional.get();
         }
@@ -47,11 +46,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(long userId, User patchUser) {
         log.info("Получен запрос на изменение данных пользователя с id {}", userId);
-        if ((patchUser.getEmail() != (null)) && userRepository.repositoryContainsUserWithEmail(patchUser)) {
+        if (patchUser.getEmail() != null && userRepository.repositoryContainsUserWithEmail(patchUser)) {
             log.error("Ошибка при изменении данных пользователя. Пользователь с таким email уже существует: {}", patchUser.getEmail());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка. Пользователь с таким email уже существует: " + patchUser.getEmail());
         }
-        return UserMapper.patchUser(patchUser, getUserById(userId));
+        if (patchUser.getName()!=null && patchUser.getName().isBlank()) {
+            log.error("Ошибка при изменении данных пользователя. Имя  не может быть пустым.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при изменении данных пользователя. Имя  не может быть пустым.");
+        }
+        return userRepository.patchUser(patchUser, getUserById(userId));
     }
 
     @Override
