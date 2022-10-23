@@ -38,4 +38,9 @@ public class ItemController {
         return itemService.updateItem(userId, itemId, ItemMapper.toItem(itemDto));
     }
 
+    @GetMapping("/search")
+    public List<Item> searchItems(@RequestParam String text) {
+        return itemService.searchItems(text);
+    }
+
 }
