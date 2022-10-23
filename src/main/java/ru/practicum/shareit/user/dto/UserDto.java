@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 
 @Data
 public class UserDto {
-    @Size(min= 1)
+    @Size(min = 1)
     private String name;
     @Size(min = 2)
     @Email

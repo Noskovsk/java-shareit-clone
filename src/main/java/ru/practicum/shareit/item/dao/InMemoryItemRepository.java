@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class InMemoryItemRepository implements ItemRepository {
     private final Map<Long, Item> itemHashMap = new HashMap<>();
     private long counter = 0;
+
     @Override
     public Optional<Item> getItemById(long itemId) {
         return Optional.ofNullable(itemHashMap.get(itemId));

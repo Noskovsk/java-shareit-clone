@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
             log.error("Ошибка при изменении данных пользователя. Пользователь с таким email уже существует: {}", patchUser.getEmail());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка. Пользователь с таким email уже существует: " + patchUser.getEmail());
         }
-        if (patchUser.getName()!=null && patchUser.getName().isBlank()) {
+        if (patchUser.getName() != null && patchUser.getName().isBlank()) {
             log.error("Ошибка при изменении данных пользователя. Имя  не может быть пустым.");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при изменении данных пользователя. Имя  не может быть пустым.");
         }
