@@ -18,7 +18,6 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    @Autowired
     private final ItemRepository itemRepository;
 
     @Autowired
