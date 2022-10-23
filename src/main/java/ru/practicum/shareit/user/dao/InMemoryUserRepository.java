@@ -35,7 +35,8 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         return new ArrayList<>(userHashMap.values());
     }
-        @Override
+
+    @Override
     public boolean deleteUser(User user) {
         return userHashMap.remove(user.getId(), user);
     }
