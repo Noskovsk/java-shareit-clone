@@ -1,19 +1,15 @@
 package ru.practicum.shareit.item.dao;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface ItemRepository {
-    Optional<Item> getItemById(long itemId);
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    List<Item> getItemsByOwner(User owner);
 
-    Optional<Item> addItem(User user, Item item);
-
-    Item updateItem(Item itemPatch, Item item);
-
-    List<Item> getItemByUserId(Long userId);
-
-    List<Item> searchItem(String text);
+    @Query("SELECT i FROM items i WHERE LOWER(i.name) like %:searchString%")
+    List<Item> searchItemsByString(String searchString);
 }

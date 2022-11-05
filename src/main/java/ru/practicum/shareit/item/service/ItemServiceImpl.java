@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collections;
@@ -26,10 +28,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item getItemById(long itemId) {
         log.info("Получен запрос на поиск вещи с id: {}", itemId);
-        Optional<Item> itemOptional = itemRepository.getItemById(itemId);
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
         if (itemOptional.isEmpty()) {
             log.error("Ошибка при поиске вещи с itemId: {}", itemId);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при поиске вещи!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ошибка при поиске вещи!");
         } else {
             return itemOptional.get();
         }
@@ -38,13 +40,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item addItem(Long userId, Item item) {
         log.info("Получен запрос на добавление вещи пользователя с id: {}. Вещь: {}", userId, item.getName());
-        Optional<Item> itemOptional = itemRepository.addItem(userService.getUserById(userId), item);
-        if (itemOptional.isEmpty()) {
-            log.error("Ошибка при добавлении вещи: {}", item.getName());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при добавлении вещи: " + item.getName());
-        } else {
-            return itemOptional.get();
-        }
+        User owner = userService.getUserById(userId);
+        item.setOwner(owner);
+        return itemRepository.save(item);
     }
 
     @Override
@@ -55,13 +53,13 @@ public class ItemServiceImpl implements ItemService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ошибка при обновлении вещи: " + itemId
                     + ". Вещь не относится к текущему пользователю id = " + userId + ".");
         }
-        return itemRepository.updateItem(itemPatch, getItemById(itemId));
+        return itemRepository.save(ItemMapper.patchItem(itemPatch, getItemById(itemId)));
     }
 
     @Override
     public List<Item> getItemByUserId(Long userId) {
         log.info("Получен запрос на получение списка вещей пользователя с id: {}.", userId);
-        return itemRepository.getItemByUserId(userId);
+        return itemRepository.getItemsByOwner(userService.getUserById(userId));
     }
 
 
@@ -72,6 +70,6 @@ public class ItemServiceImpl implements ItemService {
             log.info("Получен запрос на поиск вещей по пустой фразе!");
             return Collections.emptyList();
         }
-        return itemRepository.searchItem(text.toLowerCase());
+        return itemRepository.searchItemsByString(text.toLowerCase());
     }
 }
