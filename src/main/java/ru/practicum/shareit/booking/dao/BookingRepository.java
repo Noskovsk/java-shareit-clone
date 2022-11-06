@@ -45,7 +45,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
             "ORDER BY start_booking DESC", nativeQuery = true)
-    List<Booking> getAllBookingsByOwner(Long owner_id);
+    List<Booking> getAllBookingsByOwner(Long ownerId);
 
     @Query(value = "SELECT * " +
             "FROM bookings b " +
