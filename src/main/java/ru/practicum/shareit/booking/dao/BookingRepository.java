@@ -54,7 +54,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE i.owner_id = ?1 " +
             "AND b.status = ?2 " +
             "ORDER BY start_booking DESC", nativeQuery = true)
-    List<Booking> getAllBookingsByOwnerAndStatus(Long owner_id, String status);
+    List<Booking> getAllBookingsByOwnerAndStatus(Long ownerId, String status);
 
     @Query(value = "SELECT * " +
             "FROM bookings b " +
@@ -64,7 +64,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.start_booking <= ?2 " +
             "AND b.end_of_booking >= ?2 " +
             "ORDER BY start_booking DESC", nativeQuery = true)
-    List<Booking> getAllBookingsByOwnerCurrent(Long owner_id, LocalDateTime today);
+    List<Booking> getAllBookingsByOwnerCurrent(Long ownerId, LocalDateTime today);
 
     @Query(value = "SELECT * " +
             "FROM bookings b " +
@@ -73,7 +73,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE i.owner_id = ?1 " +
             "AND b.start_booking >= ?2 " +
             "ORDER BY start_booking DESC", nativeQuery = true)
-    List<Booking> getAllBookingsByOwnerInFuture(Long owner_id, LocalDateTime today);
+    List<Booking> getAllBookingsByOwnerInFuture(Long ownerId, LocalDateTime today);
 
     @Query(value = "SELECT * " +
             "FROM bookings b " +
@@ -82,7 +82,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE i.owner_id = ?1 " +
             "AND b.end_of_booking <= ?2 " +
             "ORDER BY start_booking DESC", nativeQuery = true)
-    List<Booking> getAllBookingsByOwnerInPast(Long owner_id, LocalDateTime today);
+    List<Booking> getAllBookingsByOwnerInPast(Long ownerId, LocalDateTime today);
 
     @Query(value = "SELECT * " +
             "FROM bookings b " +
