@@ -10,6 +10,14 @@ public class ItemMapper {
         return MODEL_MAPPER.map(itemDto, Item.class);
     }
 
+    public static Item toItem(ItemOwnerDto itemOwnerDto) {
+        return MODEL_MAPPER.map(itemOwnerDto, Item.class);
+    }
+
+    public static ItemOwnerDto toItemOwnerDto(Item item) {
+        return MODEL_MAPPER.map(item, ItemOwnerDto.class);
+    }
+
     public static Item patchItem(Item patchItem, Item itemToBePatched) {
         MODEL_MAPPER.getConfiguration().setSkipNullEnabled(true);
         MODEL_MAPPER.map(patchItem, itemToBePatched);
