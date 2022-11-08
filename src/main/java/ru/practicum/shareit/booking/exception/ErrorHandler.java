@@ -10,12 +10,9 @@ import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = {BookingController.class})
 public class ErrorHandler {
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handle(final IncorrectStatusException e) {
-        return Map.of(
-                "error", "Unknown state: " + e.getMessage()
-        );
+        return Map.of("error", "Unknown state: " + e.getMessage());
     }
 }

@@ -51,11 +51,11 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemOwnerDto addBookingInfoAndReturnItemDto(Item item) {
         ItemOwnerDto itemOwnerDto = ItemMapper.toItemOwnerDto(item);
-        Optional<Booking> lastBooking = bookingRepository.getLastBookingOfItem(item.getId(), LocalDateTime.now());
+        Optional<Booking> lastBooking = bookingRepository.getBookingByItemAndEndBeforeOrderByEndDesc(item, LocalDateTime.now());
         if (!lastBooking.isEmpty()) {
             itemOwnerDto.setLastBooking(BookingMapper.toBookingDto(lastBooking.get()));
         }
-        Optional<Booking> nextBooking = bookingRepository.getNextBookingOfItem(item, LocalDateTime.now());
+        Optional<Booking> nextBooking = bookingRepository.getBookingByItemAndStartAfterOrderByStartAsc(item, LocalDateTime.now());
         if (!nextBooking.isEmpty()) {
             itemOwnerDto.setNextBooking(BookingMapper.toBookingDto(nextBooking.get()));
         }
@@ -90,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository
                 .getItemsByOwner(userService.getUserById(userId))
                 .stream()
-                .map(i -> addBookingInfoAndReturnItemDto(i))
+                .map(this::addBookingInfoAndReturnItemDto)
                 .collect(Collectors.toList());
     }
 

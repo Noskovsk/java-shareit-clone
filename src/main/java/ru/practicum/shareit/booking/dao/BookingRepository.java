@@ -16,35 +16,29 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> getBookingsByBookerAndStatusOrderByStartDesc(User booker, BookingStatus status);
 
+    Optional<Booking> getBookingByItemAndEndBeforeOrderByEndDesc(Item item, LocalDateTime today);
+
+    Optional<Booking> getBookingByItemAndStartAfterOrderByStartAsc(Item item, LocalDateTime today);
+
+    Optional<Booking> getBookingByBookerAndItemAndStatusEqualsAndEndBefore(User booker, Item item, BookingStatus status, LocalDateTime today);
+
+    List<Booking> getBookingsByBookerAndEndBeforeOrderByStartDesc(User booker, LocalDateTime today);
+
+    List<Booking> getBookingsByBookerAndStartAfterOrderByStartDesc(User booker, LocalDateTime today);
+
     @Query("SELECT b " +
             "FROM bookings b " +
             "WHERE b.booker = :booker " +
-            "AND b.start <= :today " +
-            "AND b.end >= :today  " +
+            "AND :today BETWEEN  b.start AND b.end " +
             "ORDER BY b.start DESC")
     List<Booking> getBookingsCurrent(User booker, LocalDateTime today);
-
-    @Query("SELECT b " +
-            "FROM bookings b " +
-            "WHERE b.booker = :booker " +
-            "AND b.status = 'APPROVED' " +
-            "AND b.end <= :today " +
-            "ORDER BY b.start DESC")
-    List<Booking> getBookingsInPast(User booker, LocalDateTime today);
-
-    @Query("SELECT b " +
-            "FROM bookings b " +
-            "WHERE b.booker = :booker " +
-            "AND b.start >= :today " +
-            "ORDER BY b.start DESC")
-    List<Booking> getBookingsInFuture(User booker, LocalDateTime today);
 
     @Query(value = "SELECT * " +
             "FROM bookings b " +
             "INNER JOIN items i " +
             "ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
-            "ORDER BY start_booking DESC", nativeQuery = true)
+            "ORDER BY b.start_booking DESC", nativeQuery = true)
     List<Booking> getAllBookingsByOwner(Long ownerId);
 
     @Query(value = "SELECT * " +
@@ -53,7 +47,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
             "AND b.status = ?2 " +
-            "ORDER BY start_booking DESC", nativeQuery = true)
+            "ORDER BY b.start_booking DESC", nativeQuery = true)
     List<Booking> getAllBookingsByOwnerAndStatus(Long ownerId, String status);
 
     @Query(value = "SELECT * " +
@@ -61,9 +55,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "INNER JOIN items i " +
             "ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
-            "AND b.start_booking <= ?2 " +
-            "AND b.end_of_booking >= ?2 " +
-            "ORDER BY start_booking DESC", nativeQuery = true)
+            "AND ?2 BETWEEN b.start_booking AND b.end_of_booking " +
+            "ORDER BY b.start_booking DESC", nativeQuery = true)
     List<Booking> getAllBookingsByOwnerCurrent(Long ownerId, LocalDateTime today);
 
     @Query(value = "SELECT * " +
@@ -72,7 +65,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
             "AND b.start_booking >= ?2 " +
-            "ORDER BY start_booking DESC", nativeQuery = true)
+            "ORDER BY b.start_booking DESC", nativeQuery = true)
     List<Booking> getAllBookingsByOwnerInFuture(Long ownerId, LocalDateTime today);
 
     @Query(value = "SELECT * " +
@@ -81,20 +74,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ON i.id = b.item_id " +
             "WHERE i.owner_id = ?1 " +
             "AND b.end_of_booking <= ?2 " +
-            "ORDER BY start_booking DESC", nativeQuery = true)
+            "ORDER BY b.start_booking DESC", nativeQuery = true)
     List<Booking> getAllBookingsByOwnerInPast(Long ownerId, LocalDateTime today);
-
-    @Query(value = "SELECT * " +
-            "FROM bookings b " +
-            "WHERE b.item_id = ?1 " +
-            "AND b.end_of_booking <= ?2 " +
-            "ORDER BY end_of_booking DESC " +
-            "LIMIT 1",
-            nativeQuery = true)
-    Optional<Booking> getLastBookingOfItem(Long itemId, LocalDateTime today);
-
-    @Query("SELECT b FROM bookings b WHERE b.item = :item AND b.start >= :today ORDER BY b.start ASC")
-    Optional<Booking> getNextBookingOfItem(Item item, LocalDateTime today);
-
-    Optional<Booking> getBookingByBookerAndItemAndStatusEqualsAndEndBefore(User booker, Item item, BookingStatus status, LocalDateTime today);
 }

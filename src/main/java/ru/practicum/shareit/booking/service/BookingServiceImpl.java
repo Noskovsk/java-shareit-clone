@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.BookingQueryStatus;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.exception.IncorrectStatusException;
@@ -38,9 +39,8 @@ public class BookingServiceImpl implements BookingService {
                 && !requestUser.equals(bookingOptional.get().getItem().getOwner()))) {
             log.error("Ошибка при поиске бронирования с id: {}", bookingId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ошибка при поиске бронирования!");
-        } else {
-            return bookingOptional.get();
         }
+        return bookingOptional.get();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setItem(item);
         booking.setBooker(booker);
         booking.setStatus(BookingStatus.WAITING);
-        log.info("Сохраняем бронирование вещи {}", booking.toString());
+        log.info("Сохраняем бронирование вещи {}", booking);
         return bookingRepository.save(booking);
     }
 
@@ -97,19 +97,19 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsOfUser(Long userId, String state) {
         log.info("Получен запрос поиск бронирований. userId = {}, state = {}", userId, state);
-        if (state == null || state.isEmpty() || state.equals("ALL")) {
+        if (state == null || state.isEmpty() || state.toUpperCase().equals(BookingQueryStatus.ALL.toString())) {
             return bookingRepository.getBookingsByBookerOrderByStartDesc(userService.getUserById(userId));
         } else {
-            switch (state) {
-                case "CURRENT":
+            switch (stringToBookingQueryStatus(state)) {
+                case CURRENT:
                     return bookingRepository.getBookingsCurrent(userService.getUserById(userId), LocalDateTime.now());
-                case "PAST":
-                    return bookingRepository.getBookingsInPast(userService.getUserById(userId), LocalDateTime.now());
-                case "FUTURE":
-                    return bookingRepository.getBookingsInFuture(userService.getUserById(userId), LocalDateTime.now());
-                case "WAITING":
+                case PAST:
+                    return bookingRepository.getBookingsByBookerAndEndBeforeOrderByStartDesc(userService.getUserById(userId), LocalDateTime.now());
+                case FUTURE:
+                    return bookingRepository.getBookingsByBookerAndStartAfterOrderByStartDesc(userService.getUserById(userId), LocalDateTime.now());
+                case WAITING:
                     return bookingRepository.getBookingsByBookerAndStatusOrderByStartDesc(userService.getUserById(userId), BookingStatus.WAITING);
-                case "REJECTED":
+                case REJECTED:
                     return bookingRepository.getBookingsByBookerAndStatusOrderByStartDesc(userService.getUserById(userId), BookingStatus.REJECTED);
                 default:
                     log.error("Ошибка при поиске бронирований. Неизвестный статус: status = {}", state);
@@ -122,23 +122,31 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getBookingsOfOwner(Long userId, String state) {
         log.info("Получен запрос поиск бронирований владельца вещей. userId = {}, state = {}", userId, state);
         userService.getUserById(userId);
-        if (state == null || state.isEmpty() || state.equals("ALL")) {
+        if (state == null || state.isEmpty() || state.toUpperCase().equals(BookingQueryStatus.ALL.toString())) {
             return bookingRepository.getAllBookingsByOwner(userId);
         } else {
-            switch (state) {
-                case "CURRENT":
+            switch (stringToBookingQueryStatus(state)) {
+                case CURRENT:
                     return bookingRepository.getAllBookingsByOwnerCurrent(userId, LocalDateTime.now());
-                case "PAST":
+                case PAST:
                     return bookingRepository.getAllBookingsByOwnerInPast(userId, LocalDateTime.now());
-                case "FUTURE":
+                case FUTURE:
                     return bookingRepository.getAllBookingsByOwnerInFuture(userId, LocalDateTime.now());
-                case "WAITING":
-                case "REJECTED":
+                case WAITING:
+                case REJECTED:
                     return bookingRepository.getAllBookingsByOwnerAndStatus(userId, state);
                 default:
                     log.error("Ошибка при поиске бронирований. Неизвестный статус: status = {}", state);
                     throw new IncorrectStatusException(state);
             }
+        }
+    }
+
+    private BookingQueryStatus stringToBookingQueryStatus(String status) {
+        try {
+            return BookingQueryStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new IncorrectStatusException(status);
         }
     }
 }
