@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,9 +13,13 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.dao.CommentRepository;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemOwnerDto;
+import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.pagination.PaginationParams;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -52,27 +57,30 @@ public class ItemServiceImpl implements ItemService {
     private ItemOwnerDto addBookingInfoAndReturnItemDto(Item item) {
         ItemOwnerDto itemOwnerDto = ItemMapper.toItemOwnerDto(item);
         Optional<Booking> lastBooking = bookingRepository.getBookingByItemAndEndBeforeOrderByEndDesc(item, LocalDateTime.now());
-        if (!lastBooking.isEmpty()) {
+        if (lastBooking.isPresent()) {
             itemOwnerDto.setLastBooking(BookingMapper.toBookingDto(lastBooking.get()));
         }
         Optional<Booking> nextBooking = bookingRepository.getBookingByItemAndStartAfterOrderByStartAsc(item, LocalDateTime.now());
-        if (!nextBooking.isEmpty()) {
+        if (nextBooking.isPresent()) {
             itemOwnerDto.setNextBooking(BookingMapper.toBookingDto(nextBooking.get()));
         }
         return itemOwnerDto;
     }
 
     @Override
-    public Item addItem(Long userId, Item item) {
-        log.info("Получен запрос на добавление вещи пользователя с id: {}. Вещь: {}", userId, item.getName());
+    public ItemCreateDto addItem(Long userId, ItemCreateDto itemCreateDto) {
+        log.info("Получен запрос на добавление вещи пользователя с id: {}. Вещь: {}", userId, itemCreateDto.getName());
+        Item item = ItemMapper.toItem(itemCreateDto);
         User owner = userService.getUserById(userId);
         item.setOwner(owner);
-        return itemRepository.save(item);
+        itemCreateDto = ItemMapper.toItemCreateDto(itemRepository.save(item));
+        return itemCreateDto;
     }
 
     @Override
-    public Item updateItem(Long userId, Long itemId, Item itemPatch) {
+    public Item updateItem(Long userId, Long itemId, ItemPatchDto itemPatchDto) {
         log.info("Получен запрос на обновление данных вещи пользователя с id: {}. Вещь: {}", userId, itemId);
+        Item itemPatch = ItemMapper.toItem(itemPatchDto);
         if (!ItemMapper.toItem(getItemById(userId, itemId))
                 .getOwner()
                 .getId()
@@ -85,10 +93,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemOwnerDto> getItemByUserId(Long userId) {
+    public List<ItemOwnerDto> getItemByUserId(Long userId, Integer from, Integer size) {
         log.info("Получен запрос на получение списка вещей пользователя с id: {}.", userId);
+        PageRequest pageRequest = PaginationParams.createPageRequest(from, size);
         return itemRepository
-                .getItemsByOwner(userService.getUserById(userId))
+                .getItemsByOwner(userService.getUserById(userId), pageRequest)
                 .stream()
                 .map(this::addBookingInfoAndReturnItemDto)
                 .collect(Collectors.toList());
@@ -96,13 +105,14 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public List<Item> searchItems(String text) {
+    public List<Item> searchItems(String text, Integer from, Integer size) {
         log.info("Получен запрос на поиск вещей по фразе: {}.", text);
+        PageRequest pageRequest = PaginationParams.createPageRequest(from, size);
         if (text.isBlank()) {
             log.info("Получен запрос на поиск вещей по пустой фразе!");
             return Collections.emptyList();
         }
-        return itemRepository.searchAllByString(text.toLowerCase());
+        return itemRepository.searchAllByString(text.toLowerCase(), pageRequest).stream().collect(Collectors.toList());
     }
 
     @Override
@@ -125,5 +135,10 @@ public class ItemServiceImpl implements ItemService {
             return comment;
         }
 
+    }
+
+    @Override
+    public List<Item> getItemsByRequest(ItemRequest itemRequest) {
+        return itemRepository.getItemsByRequest(itemRequest);
     }
 }
