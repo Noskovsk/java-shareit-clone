@@ -9,6 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.BookingQueryStatus;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dao.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.IncorrectStatusException;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -48,8 +50,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public Booking createBooking(long userId, Booking booking) {
-        log.info("Получен запрос на бронирование вещи {}", booking.toString());
+    public Booking createBooking(long userId, BookingDto bookingDto) {
+        log.info("Получен запрос на бронирование вещи {}", bookingDto.toString());
+        Booking booking = BookingMapper.toBooking(bookingDto, userId);
         Item item = ItemMapper.toItem(itemService.getItemById(userId, booking.getItem().getId()));
         if (!item.getAvailable()) {
             log.error("Ошибка при бронировании вещи. Вещь не доступна, id вещи: " + item.getId());
