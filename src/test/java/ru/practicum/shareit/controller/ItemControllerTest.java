@@ -148,8 +148,7 @@ public class ItemControllerTest {
     void shouldAddComment() throws Exception {
         Comment comment = new Comment();
         comment.setText("comment");
-        CommentDto commentDto = new CommentDto();
-        commentDto.setText("comment");
+        CommentDto commentDto = CommentDto.builder().text("comment").build();
         when(itemService.addComment(any(), any(), any())).thenReturn(commentDto);
         mvc.perform(post("/items/1/comment").content(mapper.writeValueAsString(comment))
                         .characterEncoding(StandardCharsets.UTF_8)

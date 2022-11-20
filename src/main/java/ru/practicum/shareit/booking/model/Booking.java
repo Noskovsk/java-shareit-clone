@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Entity(name = "bookings")
 @ToString
 @Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Getter
 public class Booking {
