@@ -11,6 +11,8 @@ import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.comment.dao.CommentRepository;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.dto.CommentMapper;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
@@ -57,13 +59,9 @@ public class ItemServiceImpl implements ItemService {
     private ItemOwnerDto addBookingInfoAndReturnItemDto(Item item) {
         ItemOwnerDto itemOwnerDto = ItemMapper.toItemOwnerDto(item);
         Optional<Booking> lastBooking = bookingRepository.getBookingByItemAndEndBeforeOrderByEndDesc(item, LocalDateTime.now());
-        if (lastBooking.isPresent()) {
-            itemOwnerDto.setLastBooking(BookingMapper.toBookingDto(lastBooking.get()));
-        }
+        lastBooking.ifPresent(booking -> itemOwnerDto.setLastBooking(BookingMapper.toBookingDto(booking)));
         Optional<Booking> nextBooking = bookingRepository.getBookingByItemAndStartAfterOrderByStartAsc(item, LocalDateTime.now());
-        if (nextBooking.isPresent()) {
-            itemOwnerDto.setNextBooking(BookingMapper.toBookingDto(nextBooking.get()));
-        }
+        nextBooking.ifPresent(booking -> itemOwnerDto.setNextBooking(BookingMapper.toBookingDto(booking)));
         return itemOwnerDto;
     }
 
@@ -116,7 +114,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Comment addComment(Long userId, Long itemId, Comment comment) {
+    public CommentDto addComment(Long userId, Long itemId, Comment comment) {
         User booker = userService.getUserById(userId);
         Item item = ItemMapper.toItem(getItemById(userId, itemId));
         Optional<Booking> optionalBooking = bookingRepository
@@ -132,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
             comment.setItem(item);
             comment.setCreated(LocalDateTime.now());
             comment = commentRepository.save(comment);
-            return comment;
+            return CommentMapper.toCommentDto(comment);
         }
 
     }

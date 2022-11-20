@@ -5,8 +5,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Builder(toBuilder = true)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor
+@NoArgsConstructor
 @Setter
 @Getter
 public class CommentDto {
