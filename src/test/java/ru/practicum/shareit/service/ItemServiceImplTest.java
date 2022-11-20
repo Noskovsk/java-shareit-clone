@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.service;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +49,5 @@ public class ItemServiceImplTest {
         }
         assertEquals(1, itemService.getItemByUserId(2L, null, null).size(), "Количество вещей не совпадает");
         assertEquals(Long.valueOf(2), itemService.getItemByUserId(2L, null, null).get(0).getId(), "Id вещи не совпадает с ожидаемым");
-
     }
 }
