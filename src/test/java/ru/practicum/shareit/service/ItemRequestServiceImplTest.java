@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class ItemRequestServiceImplTest {
     private final ItemRequestService itemRequestService;
-    //private final UserService userService;
     private final EntityManager manager;
 
     protected List<User> createTestUserIntoDb(Integer count) {

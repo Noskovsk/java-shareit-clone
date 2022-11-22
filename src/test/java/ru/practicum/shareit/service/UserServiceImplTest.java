@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -42,7 +41,6 @@ public class UserServiceImplTest {
         return userList.stream().map(user -> user.getId()).collect(Collectors.toList());
     }
 
-    @Transactional
     @Test
     void shouldGetUserById() {
         userIdList = createTestUserIntoDb(1);
@@ -58,9 +56,7 @@ public class UserServiceImplTest {
         assertTrue(throwable.getMessage().contains("404"));
     }
 
-    @Transactional
     @Test
-    @Rollback(value = true)
     void sholdCreateUser() {
         User user = new User();
         user.setName("user1");
@@ -69,18 +65,17 @@ public class UserServiceImplTest {
         userService.createUser(user);
 
         TypedQuery<User> query = entityManager.createQuery("Select u from User u where u.email = :email", User.class);
-        user = query
+        User findUser = query
                 .setParameter("email", "email1@email.com")
                 .getSingleResult();
 
         assertThat(user.getId(), notNullValue());
+        assertThat(user.hashCode(), equalTo(findUser.hashCode()));
         assertThat(user.getEmail(), equalTo("email1@email.com"));
         assertThat(user.getName(), equalTo("user1"));
     }
 
-    @Transactional
     @Test
-    @Rollback(value = true)
     void shouldUpdateUser() {
         userIdList = createTestUserIntoDb(1);
 
@@ -93,7 +88,6 @@ public class UserServiceImplTest {
         assertThat(userToBePatched.getName(), equalTo("updatedName"));
     }
 
-    @Transactional
     @Test
     void shouldReturnListOfUser() {
         userIdList = createTestUserIntoDb(2);
@@ -103,9 +97,7 @@ public class UserServiceImplTest {
         assertEquals(userIdList.get(1), userList.get(1).getId(), "id не совпадает.");
     }
 
-    @Transactional
     @Test
-    @Rollback(value = true)
     void shouldDeleteUser() {
         userIdList = createTestUserIntoDb(1);
         userService.deleteUser(userIdList.get(0));
