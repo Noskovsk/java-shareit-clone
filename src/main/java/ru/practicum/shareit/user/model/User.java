@@ -7,7 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -30,10 +29,5 @@ public class User {
         if (!(o instanceof User)) return false;
         User user = (User) o;
         return email.equals(user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(email);
     }
 }

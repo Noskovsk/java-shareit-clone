@@ -7,10 +7,6 @@ import ru.practicum.shareit.user.model.User;
 public class UserMapper {
     private static final ModelMapper MODEL_MAPPER = new ModelMapper();
 
-    public static UserDto toUserDto(User user) {
-        return MODEL_MAPPER.map(user, UserDto.class);
-    }
-
     public static User toUser(UserDto userDto) {
         return MODEL_MAPPER.map(userDto, User.class);
     }
