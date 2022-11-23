@@ -54,13 +54,13 @@ public class BookingServiceImplMockTest {
     @Test
     void shouldReturnAllBookingsOfOwner() {
         Mockito.when(mockBookingRepository
-                .getAllBookingsByOwner(any(), any()))
+                        .getAllBookingsByOwner(any(), any()))
                 .thenReturn(new PageImpl<>(List.of(new Booking())));
         List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "ALL", null, null);
         assertEquals(1, bookingList.size(),
                 "Размерность не совпадает");
         Mockito.verify(mockBookingRepository,
-                Mockito.times(1)).getAllBookingsByOwner(any(),any());
+                Mockito.times(1)).getAllBookingsByOwner(any(), any());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class BookingServiceImplMockTest {
         assertEquals(1, bookingList.size(),
                 "Размерность не совпадает");
         Mockito.verify(mockBookingRepository,
-                Mockito.times(1)).getBookingsByBookerOrderByStartDesc(any(),any());
+                Mockito.times(1)).getBookingsByBookerOrderByStartDesc(any(), any());
     }
 
     @Test
@@ -206,6 +206,7 @@ public class BookingServiceImplMockTest {
         throwable = assertThrows(IncorrectStatusException.class, () -> bookingService.getBookingsOfOwner(1L, "UNSUPPORTED", null, null));
         assertTrue(throwable.getMessage().contains("UNSUPPORTED"));
     }
+
     @Test
     void shouldThrowExceptionWhenBookedByOwner() {
         ItemOwnerDto itemOwnerDto = new ItemOwnerDto();
