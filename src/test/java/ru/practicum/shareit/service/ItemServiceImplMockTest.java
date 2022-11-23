@@ -59,6 +59,13 @@ public class ItemServiceImplMockTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenGetItemByErrorId() {
+        Throwable throwable = assertThrows(ResponseStatusException.class,
+                () -> itemService.addComment(1L, 99L, comment));
+        assertTrue(throwable.getMessage().contains("404"));
+    }
+
+    @Test
     void shouldAddComment() {
         when(userMockService.getUserById(1L)).thenReturn(user);
         when(itemMockRepository.findById(any())).thenReturn(Optional.of(item));

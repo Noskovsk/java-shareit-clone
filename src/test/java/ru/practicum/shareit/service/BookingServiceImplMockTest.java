@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
@@ -224,6 +225,30 @@ public class BookingServiceImplMockTest {
                 .start(LocalDateTime.now().minusDays(1))
                 .end(LocalDateTime.now())
                 .bookerId(1L).build();
+        throwable = assertThrows(ResponseStatusException.class, () -> bookingService.createBooking(1L, bookingDto));
+        assertTrue(throwable.getMessage().contains("Ошибка при бронировании вещи. Вещь не доступна для бронирования владельцем, id вещи"));
+    }
+
+    @Test
+    void shouldCorrectMapBookingDto() {
+        ItemOwnerDto itemOwnerDto = new ItemOwnerDto();
+        itemOwnerDto.setAvailable(true);
+        User booker = new User();
+        booker.setId(1L);
+        itemOwnerDto.setOwner(booker);
+
+        Mockito.when(mockItemService.getItemById(anyLong(), eq(1L))).thenReturn(itemOwnerDto);
+        Mockito.when(mockUserService.getUserById(1L)).thenReturn(booker);
+
+        BookingDto bookingDto = BookingDto
+                .builder()
+                .itemId(1L)
+                .start(LocalDateTime.now().minusDays(1))
+                .end(LocalDateTime.now())
+                .bookerId(1L).build();
+        Booking booking = BookingMapper.toBooking(bookingDto, booker.getId());
+        assertEquals(booking.getStart(), bookingDto.getStart(), "Время старат не совпадает.");
+        assertEquals(booking.getEnd(), bookingDto.getEnd(), "Время окончания не совпадает.");
         throwable = assertThrows(ResponseStatusException.class, () -> bookingService.createBooking(1L, bookingDto));
         assertTrue(throwable.getMessage().contains("Ошибка при бронировании вещи. Вещь не доступна для бронирования владельцем, id вещи"));
     }
