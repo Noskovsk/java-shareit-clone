@@ -3,9 +3,11 @@ package ru.practicum.shareit.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exception.IncorrectStatusException;
@@ -17,11 +19,10 @@ import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 
 public class BookingServiceImplMockTest {
     ItemService mockItemService;
@@ -51,7 +52,162 @@ public class BookingServiceImplMockTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenBoockedByOwner() {
+    void shouldReturnAllBookingsOfOwner() {
+        Mockito.when(mockBookingRepository
+                .getAllBookingsByOwner(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "ALL", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getAllBookingsByOwner(any(),any());
+    }
+
+    @Test
+    void shouldReturnAllBookingsOfUser() {
+        Mockito.when(mockBookingRepository
+                        .getBookingsByBookerOrderByStartDesc(any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfUser(1L, "ALL", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getBookingsByBookerOrderByStartDesc(any(),any());
+    }
+
+    @Test
+    void shouldReturnCurrentBookingsOfOwner() {
+        Mockito.when(mockBookingRepository
+                        .getAllBookingsByOwnerCurrent(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "CURRENT", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getAllBookingsByOwnerCurrent(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnCurrentBookingsOfUser() {
+        Mockito.when(mockBookingRepository
+                        .getBookingsCurrent(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfUser(1L, "CURRENT", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getBookingsCurrent(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnPastBookingsOfOwner() {
+        Mockito.when(mockBookingRepository
+                        .getAllBookingsByOwnerInPast(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "PAST", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getAllBookingsByOwnerInPast(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnPastBookingsOfUser() {
+        Mockito.when(mockBookingRepository
+                        .getBookingsByBookerAndEndBeforeOrderByStartDesc(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfUser(1L, "PAST", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getBookingsByBookerAndEndBeforeOrderByStartDesc(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnFutureBookingsOfOwner() {
+        Mockito.when(mockBookingRepository
+                        .getAllBookingsByOwnerInFuture(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "FUTURE", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getAllBookingsByOwnerInFuture(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnFutureBookingsOfUser() {
+        Mockito.when(mockBookingRepository
+                        .getBookingsByBookerAndStartAfterOrderByStartDesc(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfUser(1L, "FUTURE", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getBookingsByBookerAndStartAfterOrderByStartDesc(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnWaitingBookingsOfOwner() {
+        Mockito.when(mockBookingRepository
+                        .getAllBookingsByOwnerAndStatus(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "WAITING", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getAllBookingsByOwnerAndStatus(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnWaitingBookingsOfUser() {
+        Mockito.when(mockBookingRepository
+                        .getBookingsByBookerAndStatusOrderByStartDesc(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfUser(1L, "WAITING", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getBookingsByBookerAndStatusOrderByStartDesc(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnRejectedBookingsOfOwner() {
+        Mockito.when(mockBookingRepository
+                        .getAllBookingsByOwnerAndStatus(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfOwner(1L, "REJECTED", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getAllBookingsByOwnerAndStatus(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnRejectedBookingsOfUser() {
+        Mockito.when(mockBookingRepository
+                        .getBookingsByBookerAndStatusOrderByStartDesc(any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of(new Booking())));
+        List<Booking> bookingList = bookingService.getBookingsOfUser(1L, "REJECTED", null, null);
+        assertEquals(1, bookingList.size(),
+                "Размерность не совпадает");
+        Mockito.verify(mockBookingRepository,
+                Mockito.times(1)).getBookingsByBookerAndStatusOrderByStartDesc(any(), any(), any());
+    }
+
+    @Test
+    void shouldNotReturnErrorStateBookingsOfUser() {
+        throwable = assertThrows(IncorrectStatusException.class, () -> bookingService.getBookingsOfUser(1L, "UNSUPPORTED", null, null));
+        assertTrue(throwable.getMessage().contains("UNSUPPORTED"));
+    }
+
+    @Test
+    void shouldNotReturnErrorStateBookingsOfOwner() {
+        throwable = assertThrows(IncorrectStatusException.class, () -> bookingService.getBookingsOfOwner(1L, "UNSUPPORTED", null, null));
+        assertTrue(throwable.getMessage().contains("UNSUPPORTED"));
+    }
+    @Test
+    void shouldThrowExceptionWhenBookedByOwner() {
         ItemOwnerDto itemOwnerDto = new ItemOwnerDto();
         itemOwnerDto.setAvailable(true);
         User booker = new User();
