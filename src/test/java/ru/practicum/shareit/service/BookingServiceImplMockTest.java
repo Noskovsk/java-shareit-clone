@@ -26,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
 public class BookingServiceImplMockTest {
-    ItemService mockItemService;
-    BookingRepository mockBookingRepository;
-    UserService mockUserService;
-    BookingService bookingService;
-    Throwable throwable;
+    private ItemService mockItemService;
+    private BookingRepository mockBookingRepository;
+    private UserService mockUserService;
+    private BookingService bookingService;
+    private Throwable throwable;
 
     @BeforeEach
     void prepareData() {

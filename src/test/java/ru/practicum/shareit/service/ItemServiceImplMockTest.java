@@ -26,14 +26,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class ItemServiceImplMockTest {
-    Comment comment;
-    User user;
-    Item item;
-    UserService userMockService = Mockito.mock(UserServiceImpl.class);
-    ItemRepository itemMockRepository = Mockito.mock(ItemRepository.class);
-    BookingRepository bookingMockRepository = Mockito.mock(BookingRepository.class);
-    CommentRepository commentMockRepository = Mockito.mock(CommentRepository.class);
-    ItemService itemService = new ItemServiceImpl(itemMockRepository, bookingMockRepository, userMockService, commentMockRepository);
+    private Comment comment;
+    private User user;
+    private Item item;
+    private UserService userMockService = Mockito.mock(UserServiceImpl.class);
+    private ItemRepository itemMockRepository = Mockito.mock(ItemRepository.class);
+    private BookingRepository bookingMockRepository = Mockito.mock(BookingRepository.class);
+    private CommentRepository commentMockRepository = Mockito.mock(CommentRepository.class);
+    private ItemService itemService = new ItemServiceImpl(itemMockRepository, bookingMockRepository, userMockService, commentMockRepository);
 
     @BeforeEach
     void createTestData() {

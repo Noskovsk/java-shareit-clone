@@ -33,11 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ItemControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @MockBean
-    ItemService itemService;
-    List<ItemOwnerDto> itemOwnerDtoList;
-    List<ItemCreateDto> itemCreateDtos;
-    List<ItemPatchDto> itemPatchDtos;
-    List<Item> itemList;
+    private ItemService itemService;
+    private List<ItemOwnerDto> itemOwnerDtoList;
+    private List<ItemCreateDto> itemCreateDtos;
+    private List<ItemPatchDto> itemPatchDtos;
+    private List<Item> itemList;
     @Autowired
     private MockMvc mvc;
 

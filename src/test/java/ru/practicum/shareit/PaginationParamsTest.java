@@ -18,7 +18,7 @@ public class PaginationParamsTest {
         assertNotNull(throwable.getMessage());
 
         throwable = assertThrows(ResponseStatusException.class, () -> PaginationParams.createPageRequest(0, sizeNegative));
-        assertNotNull(throwable.getMessage());
+        assertTrue(throwable.getMessage().contains("Неверные параметры пагинации"));
     }
 
     @Test
@@ -26,14 +26,14 @@ public class PaginationParamsTest {
         Integer sizeZero = 0;
 
         Throwable throwable = assertThrows(ResponseStatusException.class, () -> PaginationParams.createPageRequest(0, sizeZero));
-        assertNotNull(throwable.getMessage());
+        assertTrue(throwable.getMessage().contains("Неверные параметры пагинации"));
     }
 
     @Test
     void shouldCreateCorrectPageRequestWithNullSize() {
         PageRequest pageRequest = PaginationParams.createPageRequest(5, null);
         assertEquals(0, pageRequest.getPageNumber(), "Первая страница задана неверно.");
-        assertEquals(Integer.MAX_VALUE, pageRequest.getPageSize(), "Развер задан неверно.");
+        assertEquals(Integer.MAX_VALUE, pageRequest.getPageSize(), "Размер задан неверно.");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class PaginationParamsTest {
     void shouldCreateCorrectPageRequestWithoutOrder() {
         PageRequest pageRequest = PaginationParams.createPageRequest(5, 5);
         assertEquals(1, pageRequest.getPageNumber(), "Первая страница задана неверно.");
-        assertEquals(5, pageRequest.getPageSize(), "Развер задан неверно.");
+        assertEquals(5, pageRequest.getPageSize(), "Размер задан неверно.");
     }
 
     @Test
