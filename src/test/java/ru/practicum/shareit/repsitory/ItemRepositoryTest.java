@@ -38,7 +38,7 @@ public class ItemRepositoryTest {
     }
 
     @Test
-    void shouldGetItemRequestsByRequestor () {
+    void shouldGetItemRequestsByRequestor() {
         List<User> userList = createTestUserIntoDb(1);
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setDescription("description");
