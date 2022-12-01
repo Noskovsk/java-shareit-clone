@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
@@ -23,7 +22,7 @@ public class BookingController {
 
     @PostMapping
     public Booking createBooking(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody BookingDto bookingDto) {
-        return bookingService.createBooking(userId, BookingMapper.toBooking(bookingDto, userId));
+        return bookingService.createBooking(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
@@ -35,14 +34,18 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getBookingsOfUser(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                           @RequestParam(required = false) String state) {
-        return bookingService.getBookingsOfUser(userId, state);
+                                           @RequestParam(required = false) String state,
+                                           @RequestParam(required = false) Integer from,
+                                           @RequestParam(required = false) Integer size) {
+        return bookingService.getBookingsOfUser(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<Booking> getBookingsOfOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                            @RequestParam(required = false) String state) {
-        return bookingService.getBookingsOfOwner(userId, state);
+                                            @RequestParam(required = false) String state,
+                                            @RequestParam(required = false) Integer from,
+                                            @RequestParam(required = false) Integer size) {
+        return bookingService.getBookingsOfOwner(userId, state, from, size);
     }
 
 }

@@ -2,17 +2,21 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.BookingQueryStatus;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dao.BookingRepository;
-import ru.practicum.shareit.booking.exception.IncorrectStatusException;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.exception.IncorrectStatusException;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.pagination.PaginationParams;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -20,6 +24,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -45,8 +50,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public Booking createBooking(long userId, Booking booking) {
-        log.info("Получен запрос на бронирование вещи {}", booking.toString());
+    public Booking createBooking(long userId, BookingDto bookingDto) {
+        log.info("Получен запрос на бронирование вещи {}", bookingDto.toString());
+        Booking booking = BookingMapper.toBooking(bookingDto, userId);
         Item item = ItemMapper.toItem(itemService.getItemById(userId, booking.getItem().getId()));
         if (!item.getAvailable()) {
             log.error("Ошибка при бронировании вещи. Вещь не доступна, id вещи: " + item.getId());
@@ -95,22 +101,35 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsOfUser(Long userId, String state) {
+    public List<Booking> getBookingsOfUser(Long userId, String state, Integer from, Integer size) {
         log.info("Получен запрос поиск бронирований. userId = {}, state = {}", userId, state);
+        PageRequest pageRequest = PaginationParams.createPageRequest(from, size);
         if (state == null || state.isEmpty() || state.toUpperCase().equals(BookingQueryStatus.ALL.toString())) {
-            return bookingRepository.getBookingsByBookerOrderByStartDesc(userService.getUserById(userId));
+            return bookingRepository.getBookingsByBookerOrderByStartDesc(userService.getUserById(userId), pageRequest)
+                    .stream()
+                    .collect(Collectors.toList());
         } else {
             switch (stringToBookingQueryStatus(state)) {
                 case CURRENT:
-                    return bookingRepository.getBookingsCurrent(userService.getUserById(userId), LocalDateTime.now());
+                    return bookingRepository.getBookingsCurrent(userService.getUserById(userId), LocalDateTime.now(), pageRequest)
+                            .stream()
+                            .collect(Collectors.toList());
                 case PAST:
-                    return bookingRepository.getBookingsByBookerAndEndBeforeOrderByStartDesc(userService.getUserById(userId), LocalDateTime.now());
+                    return bookingRepository.getBookingsByBookerAndEndBeforeOrderByStartDesc(userService.getUserById(userId), LocalDateTime.now(), pageRequest)
+                            .stream()
+                            .collect(Collectors.toList());
                 case FUTURE:
-                    return bookingRepository.getBookingsByBookerAndStartAfterOrderByStartDesc(userService.getUserById(userId), LocalDateTime.now());
+                    return bookingRepository.getBookingsByBookerAndStartAfterOrderByStartDesc(userService.getUserById(userId), LocalDateTime.now(), pageRequest)
+                            .stream()
+                            .collect(Collectors.toList());
                 case WAITING:
-                    return bookingRepository.getBookingsByBookerAndStatusOrderByStartDesc(userService.getUserById(userId), BookingStatus.WAITING);
+                    return bookingRepository.getBookingsByBookerAndStatusOrderByStartDesc(userService.getUserById(userId), BookingStatus.WAITING, pageRequest)
+                            .stream()
+                            .collect(Collectors.toList());
                 case REJECTED:
-                    return bookingRepository.getBookingsByBookerAndStatusOrderByStartDesc(userService.getUserById(userId), BookingStatus.REJECTED);
+                    return bookingRepository.getBookingsByBookerAndStatusOrderByStartDesc(userService.getUserById(userId), BookingStatus.REJECTED, pageRequest)
+                            .stream()
+                            .collect(Collectors.toList());
                 default:
                     log.error("Ошибка при поиске бронирований. Неизвестный статус: status = {}", state);
                     throw new IncorrectStatusException(state);
@@ -119,22 +138,23 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsOfOwner(Long userId, String state) {
+    public List<Booking> getBookingsOfOwner(Long userId, String state, Integer from, Integer size) {
         log.info("Получен запрос поиск бронирований владельца вещей. userId = {}, state = {}", userId, state);
+        PageRequest pageRequest = PaginationParams.createPageRequest(from, size);
         userService.getUserById(userId);
         if (state == null || state.isEmpty() || state.toUpperCase().equals(BookingQueryStatus.ALL.toString())) {
-            return bookingRepository.getAllBookingsByOwner(userId);
+            return bookingRepository.getAllBookingsByOwner(userId, pageRequest).stream().collect(Collectors.toList());
         } else {
             switch (stringToBookingQueryStatus(state)) {
                 case CURRENT:
-                    return bookingRepository.getAllBookingsByOwnerCurrent(userId, LocalDateTime.now());
+                    return bookingRepository.getAllBookingsByOwnerCurrent(userId, LocalDateTime.now(), pageRequest).stream().collect(Collectors.toList());
                 case PAST:
-                    return bookingRepository.getAllBookingsByOwnerInPast(userId, LocalDateTime.now());
+                    return bookingRepository.getAllBookingsByOwnerInPast(userId, LocalDateTime.now(), pageRequest).stream().collect(Collectors.toList());
                 case FUTURE:
-                    return bookingRepository.getAllBookingsByOwnerInFuture(userId, LocalDateTime.now());
+                    return bookingRepository.getAllBookingsByOwnerInFuture(userId, LocalDateTime.now(), pageRequest).stream().collect(Collectors.toList());
                 case WAITING:
                 case REJECTED:
-                    return bookingRepository.getAllBookingsByOwnerAndStatus(userId, state);
+                    return bookingRepository.getAllBookingsByOwnerAndStatus(userId, state, pageRequest).stream().collect(Collectors.toList());
                 default:
                     log.error("Ошибка при поиске бронирований. Неизвестный статус: status = {}", state);
                     throw new IncorrectStatusException(state);
