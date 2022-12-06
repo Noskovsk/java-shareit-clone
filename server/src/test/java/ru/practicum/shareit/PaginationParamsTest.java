@@ -3,10 +3,9 @@ package ru.practicum.shareit;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.pagination.PaginationParams;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PaginationParamsTest {
 
