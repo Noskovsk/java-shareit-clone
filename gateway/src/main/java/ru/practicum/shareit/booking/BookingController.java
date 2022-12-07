@@ -30,7 +30,6 @@ public class BookingController {
                                               @RequestParam(name = "state", defaultValue = "all") String stateParam,
                                               @PositiveOrZero @RequestParam(required = false) Integer from,
                                               @Positive @RequestParam(required = false) Integer size) {
-
         BookingState state = BookingState.from(stateParam)
                 .orElseThrow(() -> new IncorrectStatusException(stateParam));
         log.info("gateway: Получить бронирования со статусом бронирование {}, userId={}, from={}, size={}", stateParam, userId, from, size);
