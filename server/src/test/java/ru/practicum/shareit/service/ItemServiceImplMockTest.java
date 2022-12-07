@@ -77,6 +77,6 @@ public class ItemServiceImplMockTest {
         CommentDto commentDto = itemService.addComment(1L, 1L, comment);
 
         assertEquals("some text", commentDto.getText(), "Текст комментария не совпадает.");
-        assertEquals(1L, commentDto.getId(), "Не совпадает идентефикатор комментария.");
+        assertEquals(1L, Optional.ofNullable(commentDto.getId()), "Не совпадает идентефикатор комментария.");
     }
 }
