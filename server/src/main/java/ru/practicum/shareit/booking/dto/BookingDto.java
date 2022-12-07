@@ -11,9 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class BookingDto {
     private Long id;
-    //@FutureOrPresent
     private LocalDateTime start;
-    //@FutureOrPresent
     private LocalDateTime end;
     private Long itemId;
     private Long bookerId;

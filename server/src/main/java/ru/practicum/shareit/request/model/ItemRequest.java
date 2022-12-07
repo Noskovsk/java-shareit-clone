@@ -15,7 +15,6 @@ public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //@NotBlank
     private String description;
     @ManyToOne
     @JoinColumn(name = "requestor_id")

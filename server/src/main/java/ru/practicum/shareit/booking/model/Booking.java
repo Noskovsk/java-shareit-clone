@@ -27,10 +27,8 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //@FutureOrPresent
     @Column(name = "start_booking", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private LocalDateTime start;
-    //@FutureOrPresent
     @Column(name = "end_of_booking", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private LocalDateTime end;
     @ManyToOne(fetch = FetchType.LAZY)

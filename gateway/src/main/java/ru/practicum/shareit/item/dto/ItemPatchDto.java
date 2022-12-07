@@ -11,5 +11,4 @@ public class ItemPatchDto {
     @Size(min = 1)
     private String description;
     private Boolean available;
-    //private ItemRequest request;
 }
